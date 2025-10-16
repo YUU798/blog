@@ -1,3 +1,4 @@
+
 // グローバル変数
 let currentUser = null;
 let authToken = localStorage.getItem('authToken');

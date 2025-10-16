@@ -14,7 +14,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // 静的ファイルの提供
 app.use(express.static('public'));
 
-// データベース接続設定
+// データベース接続設定（オプション）
+let isDatabaseConnected = false;
+
 const connectWithRetry = async (retryCount = 0) => {
   const maxRetries = parseInt(process.env.MAX_RETRY_COUNT) || 5;
   const retryDelay = parseInt(process.env.RETRY_DELAY_MS) || 1000;
@@ -27,28 +29,31 @@ const connectWithRetry = async (retryCount = 0) => {
       socketTimeoutMS: 45000,
     });
     console.log('✅ MongoDBに接続しました');
+    isDatabaseConnected = true;
   } catch (err) {
-    console.error(`❌ MongoDB接続エラー (試行 ${retryCount + 1}/${maxRetries}):`, err.message);
-    
     if (retryCount < maxRetries - 1) {
       console.log(`⏳ ${retryDelay}ms後に再接続を試みます...`);
       setTimeout(() => connectWithRetry(retryCount + 1), retryDelay);
     } else {
-      console.log('⚠️ MongoDBが起動していないため、アプリケーションはデータベースなしで動作します');
+      console.log('ℹ️ MongoDBが起動していないため、デモモードで動作します');
+      console.log('📝 機能制限: データはメモリ内でのみ保持されます');
+      isDatabaseConnected = false;
     }
   }
 };
 
-// データベース接続開始
-connectWithRetry();
+// データベース接続開始（MongoDBが利用可能な場合のみ）
+if (process.env.MONGODB_URI && process.env.MONGODB_URI !== 'mongodb://localhost:27017/blog') {
+  connectWithRetry();
+} else {
+  console.log('ℹ️ デモモードで起動します');
+  console.log('📝 機能制限: データはメモリ内でのみ保持されます');
+}
 
-// データベース接続イベントの監視
-mongoose.connection.on('disconnected', () => {
-  console.log('⚠️ MongoDBから切断されました');
-});
-
-mongoose.connection.on('error', (err) => {
-  console.error('❌ MongoDB接続エラー:', err);
+// データベース接続状態を確認するミドルウェア
+app.use((req, res, next) => {
+  req.isDatabaseConnected = isDatabaseConnected;
+  next();
 });
 
 // ルートのインポート
@@ -77,21 +82,21 @@ app.get('/health', (req, res) => {
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     memory: process.memoryUsage(),
-    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    database: isDatabaseConnected ? 'connected' : 'demo_mode',
     environment: process.env.NODE_ENV || 'development'
   };
   
-  const statusCode = mongoose.connection.readyState === 1 ? 200 : 503;
-  res.status(statusCode).json(healthStatus);
+  res.status(200).json(healthStatus);
 });
 
 // サーバー状態エンドポイント
 app.get('/status', (req, res) => {
   res.json({
     server: 'running',
-    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    database: isDatabaseConnected ? 'connected' : 'demo_mode',
     environment: process.env.NODE_ENV || 'development',
-    version: '1.0.0'
+    version: '1.0.0',
+    mode: isDatabaseConnected ? 'production' : 'demo'
   });
 });
 
@@ -122,11 +127,20 @@ const gracefulShutdown = (signal) => {
   server.close(() => {
     console.log('✅ HTTPサーバーを閉じました');
     
-    mongoose.connection.close(false, () => {
-      console.log('✅ MongoDB接続を閉じました');
+    if (isDatabaseConnected) {
+      mongoose.connection.close().then(() => {
+        console.log('✅ MongoDB接続を閉じました');
+        console.log('👋 サーバーを正常に終了しました');
+        process.exit(0);
+      }).catch((err) => {
+        console.log('⚠️ MongoDB接続のクローズ中にエラーが発生しました:', err.message);
+        console.log('👋 サーバーを終了しました');
+        process.exit(0);
+      });
+    } else {
       console.log('👋 サーバーを正常に終了しました');
       process.exit(0);
-    });
+    }
   });
 
   // 強制終了タイマー（30秒）

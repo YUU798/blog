@@ -1,10 +1,14 @@
 {
   "name": "blog-system",
   "version": "1.0.0",
+  "homepage": "https://YUU798.github.io/blog",
   "description": "A simple blog system with user authentication and article management",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "dev": "nodemon server.js",
     "prod": "NODE_ENV=production node server.js",
     "pm2:start": "pm2 start ecosystem.config.js",
@@ -15,19 +19,25 @@
     "health:check": "node test-server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["blog", "nodejs", "express", "mongodb"],
+  "keywords": [
+    "blog",
+    "nodejs",
+    "express",
+    "mongodb"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2",
-    "mongoose": "^7.5.0",
     "bcryptjs": "^2.4.3",
-    "jsonwebtoken": "^9.0.2",
-    "dotenv": "^16.3.1",
+    "body-parser": "^1.20.2",
     "cors": "^2.8.5",
-    "body-parser": "^1.20.2"
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^7.5.0"
   },
   "devDependencies": {
+    "gh-pages": "^6.3.0",
     "nodemon": "^3.0.1"
   }
 }
