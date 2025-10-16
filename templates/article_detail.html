@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}{{ article.title }} - ブログシステム{% endblock %}
+
+{% block content %}
+<article style="max-width: 800px; margin: 0 auto; padding: 0;">
+    <header style="margin-bottom: 2rem; padding-top: 0;">
+        <h1 style="font-size: 2rem; margin-bottom: 1rem; color: #333; font-weight: 600; scroll-margin-top: 80px;">{{ article.title }}</h1>
+        <div style="display: flex; justify-content: space-between; align-items: center; color: #666; font-size: 0.9rem;">
+            <span>著者: {{ article.author.username }}</span>
+            <span>投稿日: {{ article.created_at.strftime('%Y年%m月%d日') }}</span>
+        </div>
+        {% if not article.is_published %}
+        <div style="margin-top: 1rem;">
+            <span style="background-color: #6c757d; color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.8rem;">非公開</span>
+        </div>
+        {% endif %}
+    </header>
+    
+    <div style="line-height: 1.8; font-size: 1.1rem; white-space: pre-line; background: white; padding: 2rem; border-radius: 5px; margin-bottom: 2rem;">
+        {{ article.content }}
+    </div>
+    
+    <!-- コメントセクション -->
+    <section style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #eee;">
+        <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem; color: #333;">コメント</h3>
+        
+        <!-- コメントフォーム -->
+        {% if current_user.is_authenticated %}
+        <form method="POST" action="{{ url_for('add_comment', article_id=article.id) }}" style="margin-bottom: 2rem;">
+            <div style="margin-bottom: 1rem;">
+                <textarea name="content" placeholder="コメントを入力してください..."
+                          style="width: 100%; padding: 1rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem; min-height: 100px; resize: vertical;"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2rem;">コメントを投稿</button>
+        </form>
+        {% else %}
+        <p style="margin-bottom: 2rem; color: #666;">
+            コメントを投稿するには<a href="{{ url_for('login') }}">ログイン</a>してください
+        </p>
+        {% endif %}
+        
+        <!-- コメント一覧 -->
+        {% if comments %}
+        <div class="comments-list">
+            {% for comment in comments %}
+            <div class="comment" style="background: white; padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #e9ecef;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                    <strong style="color: #333;">{{ comment.author.username }}</strong>
+                    <small style="color: #666;">{{ comment.created_at.strftime('%Y年%m月%d日 %H:%M') }}</small>
+                </div>
+                <div style="line-height: 1.6; color: #333; white-space: pre-line;">{{ comment.content }}</div>
+                
+                <!-- 返信セクション -->
+                <div style="margin-top: 1rem;">
+                    <!-- 返信フォーム -->
+                    {% if current_user.is_authenticated %}
+                    <form method="POST" action="{{ url_for('add_reply', comment_id=comment.id) }}" style="margin-top: 1rem;">
+                        <div style="display: flex; gap: 0.5rem;">
+                            <input type="text" name="content" placeholder="返信を入力..."
+                                   style="flex: 1; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px; font-size: 0.9rem;">
+                            <button type="submit" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">返信</button>
+                        </div>
+                    </form>
+                    {% else %}
+                    <p style="margin-top: 0.5rem; font-size: 0.9rem; color: #666;">
+                        <a href="{{ url_for('login') }}">ログイン</a>して返信
+                    </p>
+                    {% endif %}
+                    
+                    <!-- 返信一覧 -->
+                    {% if comment.replies %}
+                    <div class="replies" style="margin-top: 1rem; padding-left: 1rem; border-left: 3px solid #e9ecef;">
+                        {% for reply in comment.replies %}
+                            {% if not reply.parent_reply_id %}
+                                {% include 'reply_item.html' %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="color: #666; text-align: center; padding: 2rem;">まだコメントはありません</p>
+        {% endif %}
+    </section>
+    
+    <footer style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #eee;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <a href="{{ url_for('index') }}" style="color: #007bff; text-decoration: none; font-weight: 500;">← 記事一覧に戻る</a>
+            
+            {% if current_user.is_authenticated and current_user.id == article.author_id %}
+            <div style="display: flex; gap: 1rem;">
+                <a href="{{ url_for('edit_article', article_id=article.id) }}" class="btn btn-outline">編集</a>
+                <a href="{{ url_for('delete_article', article_id=article.id) }}" class="btn btn-outline"
+                   onclick="return confirm('この記事を削除してもよろしいですか？')"
+                   style="background-color: #dc3545; color: white; border-color: #dc3545;">削除</a>
+            </div>
+            {% endif %}
+        </div>
+    </footer>
+</article>
+{% endblock %}

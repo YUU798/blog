@@ -1,0 +1,33 @@
+<div class="reply" style="background: white; padding: 1rem; border-radius: 5px; margin-bottom: 0.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.3rem;">
+        <strong style="color: #333; font-size: 0.9rem;">{{ reply.author.username }}</strong>
+        <small style="color: #666; font-size: 0.8rem;">{{ reply.created_at.strftime('%Y年%m月%d日 %H:%M') }}</small>
+    </div>
+    <div style="line-height: 1.5; color: #333; white-space: pre-line; font-size: 0.9rem;">{{ reply.content }}</div>
+    
+    <!-- 返信に返信するフォーム -->
+    {% if current_user.is_authenticated %}
+    <form method="POST" action="{{ url_for('add_reply_to_reply', reply_id=reply.id) }}" style="margin-top: 0.5rem;">
+        <div style="display: flex; gap: 0.5rem;">
+            <input type="text" name="content" placeholder="返信を入力..."
+                   style="flex: 1; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px; font-size: 0.9rem;">
+            <button type="submit" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">返信</button>
+        </div>
+    </form>
+    {% else %}
+    <p style="margin-top: 0.5rem; font-size: 0.8rem; color: #666;">
+        <a href="{{ url_for('login') }}">ログイン</a>して返信
+    </p>
+    {% endif %}
+    
+    <!-- 子返信の表示（再帰的） -->
+    {% set child_replies = reply.get_child_replies() %}
+    {% if child_replies %}
+    <div class="child-replies" style="margin-top: 0.5rem; padding-left: 1rem; border-left: 2px solid #e9ecef;">
+        {% for child_reply in child_replies %}
+            {% set reply = child_reply %}
+            {% include 'reply_item.html' %}
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>

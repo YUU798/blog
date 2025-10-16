@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}記事作成 - ブログシステム{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 2rem auto; padding: 2rem; background: white; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+    <h2 style="text-align: center; margin-bottom: 2rem; color: #333;">新しい記事を作成</h2>
+    
+    <form method="POST">
+        <div style="margin-bottom: 1.5rem;">
+            <label for="title" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">記事タイトル</label>
+            <input type="text" id="title" name="title" required 
+                   style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 5px; font-size: 1rem; transition: border-color 0.3s;"
+                   onfocus="this.style.borderColor='#007bff'" onblur="this.style.borderColor='#ddd'"
+                   placeholder="記事のタイトルを入力してください">
+        </div>
+        
+        <div style="margin-bottom: 1.5rem;">
+            <label for="content" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">記事本文</label>
+            <textarea id="content" name="content" required rows="15"
+                      style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 5px; font-size: 1rem; transition: border-color 0.3s; resize: vertical;"
+                      onfocus="this.style.borderColor='#007bff'" onblur="this.style.borderColor='#ddd'"
+                      placeholder="記事の本文を入力してください"></textarea>
+        </div>
+        
+        <div style="margin-bottom: 2rem;">
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                <input type="checkbox" id="is_published" name="is_published" checked>
+                <span style="font-weight: 500;">公開する</span>
+            </label>
+            <small style="color: #666; margin-top: 0.25rem; display: block;">
+                チェックを外すと非公開記事として保存されます
+            </small>
+        </div>
+        
+        <div style="display: flex; gap: 1rem;">
+            <button type="submit" class="btn btn-primary" style="flex: 1;">投稿する</button>
+            <a href="{{ url_for('index') }}" class="btn btn-outline" style="flex: 1; text-align: center;">キャンセル</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

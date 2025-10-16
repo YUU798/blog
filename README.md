@@ -1,208 +1,113 @@
-# ブログシステム
+# ブログシステム（Flask版）
 
-Node.js + Express + MongoDB を使用したシンプルなブログシステムです。ユーザー登録、ログイン、記事投稿、編集、コメント機能を備えています。
+このプロジェクトは、Flaskを使用した動的なブログシステムです。ユーザー認証、記事の作成・編集・削除機能を備えています。
 
-## 機能
+## 特徴
 
-- ✅ ユーザー登録
-- ✅ ログイン
-- ✅ 記事投稿
-- ✅ 記事編集
-- ✅ 記事一覧表示
-- ✅ コメント投稿
-- ✅ レスポンシブデザイン
-- ✅ URLルーティング（GitHubスタイルの個別記事ページ）
+- **ユーザー認証**: ログイン/ログアウト、新規登録機能
+- **記事管理**: 記事の作成、編集、削除、公開/非公開設定
+- **レスポンシブデザイン**: モバイル対応の美しいUI
+- **SQLiteデータベース**: 軽量なデータベースを使用
 
 ## 技術スタック
 
-- **バックエンド**: Node.js, Express.js
-- **データベース**: MongoDB with Mongoose
-- **認証**: JWT (JSON Web Tokens)
-- **フロントエンド**: 純粋なHTML/CSS/JavaScript
-- **パスワードハッシュ**: bcryptjs
+- **バックエンド**: Flask 2.3.3
+- **データベース**: SQLite + SQLAlchemy
+- **認証**: Flask-Login
+- **フロントエンド**: HTML + CSS (インラインスタイル)
+- **テンプレート**: Jinja2
 
 ## インストールとセットアップ
 
-### 前提条件
+### 1. 依存関係のインストール
 
-- Node.js (v14以上)
-- MongoDB (ローカルまたはMongoDB Atlas)
-
-### インストール手順
-
-1. リポジトリをクローン
 ```bash
-git clone <repository-url>
-cd blog
+pip install -r requirements.txt
 ```
 
-2. 依存パッケージをインストール
+### 2. アプリケーションの起動
+
 ```bash
-npm install
+python app.py
 ```
 
-3. 環境変数の設定
-`.env` ファイルを編集して、実際の設定値を入力してください：
-```env
-PORT=3000
-MONGODB_URI=mongodb://localhost:27017/blog_system
-JWT_SECRET=your_secure_jwt_secret_key_here
-NODE_ENV=development
+### 3. ブラウザで確認
+
+```
+http://localhost:5000
 ```
 
-4. MongoDBの起動
-ローカルのMongoDBを使用する場合：
-```bash
-# macOS (Homebrewを使用している場合)
-brew services start mongodb-community
+## 機能
 
-# または直接起動
-mongod
-```
+### ユーザー機能
+- 新規ユーザー登録
+- ログイン/ログアウト
+- プロフィール管理
 
-5. アプリケーションの起動
-```bash
-# 開発モード
-npm run dev
+### 記事機能
+- 記事の作成と投稿
+- 記事の編集と更新
+- 記事の削除
+- 公開/非公開設定
+- 記事一覧表示
+- 記事詳細表示
 
-# または本番モード
-npm start
-```
-
-6. ブラウザでアクセス
-```
-http://localhost:3000
-```
-
-## APIエンドポイント
-
-### 認証関連
-
-- `POST /api/auth/register` - ユーザー登録
-- `POST /api/auth/login` - ログイン
-- `GET /api/auth/me` - 現在のユーザー情報取得
-
-### 記事関連
-
-- `GET /api/articles` - 記事一覧取得
-- `GET /api/articles/:id` - 特定の記事取得
-- `POST /api/articles` - 記事作成（認証必要）
-- `PUT /api/articles/:id` - 記事更新（認証必要）
-- `DELETE /api/articles/:id` - 記事削除（認証必要）
-
-### コメント関連
-
-- `GET /api/comments/article/:articleId` - 記事のコメント一覧
-- `POST /api/comments` - コメント投稿（認証必要）
-- `PUT /api/comments/:id` - コメント更新（認証必要）
-- `DELETE /api/comments/:id` - コメント削除（認証必要）
+### 権限管理
+- 自分の記事のみ編集・削除可能
+- 非公開記事は著者のみ閲覧可能
+- 公開記事は誰でも閲覧可能
 
 ## プロジェクト構造
 
 ```
-blog/
-├── models/                 # データベースモデル
-│   ├── User.js           # ユーザーモデル
-│   ├── Article.js        # 記事モデル
-│   └── Comment.js        # コメントモデル
-├── routes/               # APIルート
-│   ├── auth.js          # 認証ルート
-│   ├── articles.js      # 記事ルート
-│   └── comments.js      # コメントルート
-├── middleware/           # ミドルウェア
-│   └── auth.js          # 認証ミドルウェア
-├── public/              # フロントエンドファイル
-│   ├── index.html       # メインページ
-│   └── app.js          # フロントエンドJavaScript
-├── server.js           # メインサーバーファイル
-├── package.json        # プロジェクト設定
-├── .env               # 環境変数
-└── README.md          # プロジェクト説明
+.
+├── app.py                 # メインアプリケーション
+├── requirements.txt       # Python依存関係
+├── blog.db               # データベースファイル（自動生成）
+└── templates/            # Jinja2テンプレート
+    ├── base.html         # ベースレイアウト
+    ├── index.html        # トップページ
+    ├── login.html        # ログインページ
+    ├── register.html     # 新規登録ページ
+    ├── article_detail.html # 記事詳細ページ
+    ├── create_article.html # 記事作成ページ
+    ├── edit_article.html   # 記事編集ページ
+    └── my_articles.html  # 自分の記事一覧
 ```
 
 ## 使用方法
 
-### ユーザー登録
+1. **新規登録**: トップページの「新規登録」ボタンからアカウント作成
+2. **ログイン**: 登録したメールアドレスとパスワードでログイン
+3. **記事作成**: ログイン後、「記事を書く」ボタンから新規記事を作成
+4. **記事管理**: 「自分の記事」ページから記事の編集・削除が可能
 
-1. トップページの「新規登録」ボタンをクリック
-2. ユーザー名、メールアドレス、パスワードを入力
-3. 登録ボタンをクリック
+## データベースモデル
 
-### ログイン
+### User（ユーザー）
+- id: 主キー
+- username: ユーザー名
+- email: メールアドレス
+- password_hash: パスワードハッシュ
+- created_at: 作成日時
 
-1. トップページの「ログイン」ボタンをクリック
-2. メールアドレスとパスワードを入力
-3. ログインボタンをクリック
-
-### 記事の投稿
-
-1. ログイン後、「記事を書く」ボタンが表示されます
-2. 記事タイトルと本文を入力
-3. 投稿ボタンをクリック
-
-### コメントの投稿
-
-1. 記事詳細ページでコメントフォームを表示
-2. コメント内容を入力
-3. 投稿ボタンをクリック
+### Article（記事）
+- id: 主キー
+- title: 記事タイトル
+- content: 記事本文
+- author_id: 著者ID（外部キー）
+- is_published: 公開フラグ
+- created_at: 作成日時
+- updated_at: 更新日時
 
 ## 開発者向け情報
 
-### データベーススキーマ
+### 環境変数
+- `SECRET_KEY`: Flaskのシークレットキー
+- `SQLALCHEMY_DATABASE_URI`: データベース接続URI
 
-#### ユーザー (User)
-- `username` - ユーザー名（一意）
-- `email` - メールアドレス（一意）
-- `password` - ハッシュ化されたパスワード
-- `role` - ユーザーロール（user/admin）
-
-#### 記事 (Article)
-- `title` - 記事タイトル
-- `content` - 記事本文
-- `author` - 著者（User参照）
-- `tags` - タグ配列
-- `isPublished` - 公開状態
-- `viewCount` - 閲覧数
-
-#### コメント (Comment)
-- `content` - コメント内容
-- `author` - 投稿者（User参照）
-- `article` - 対象記事（Article参照）
-- `parentComment` - 親コメント（返信の場合）
-
-### セキュリティ機能
-
-- パスワードのbcryptによるハッシュ化
-- JWTトークンによる認証
-- 入力バリデーション
-- CORS設定
-- 環境変数による設定管理
-
-## 今後の拡張予定
-
-- [ ] 記事検索機能
-- [ ] タグ管理
-- [ ] 画像アップロード
-- [ ] 管理者ダッシュボード
-- [ ] メール通知
-- [ ] ソーシャルログイン
-- [ ] 記事のお気に入り機能
-
-## トラブルシューティング
-
-### MongoDB接続エラー
-- MongoDBが起動しているか確認
-- `.env`ファイルのMONGODB_URIが正しいか確認
-
-### ポートが使用中
-- 別のポート番号を指定するか、使用中のプロセスを終了
-
-### 依存パッケージのエラー
-- `node_modules`フォルダを削除して再インストール
-```bash
-rm -rf node_modules
-npm install
-```
+### データベースの初期化
+アプリケーション初回起動時に自動的にデータベースとテーブルが作成されます。
 
 ## ライセンス
 
