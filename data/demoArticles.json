@@ -1,0 +1,60 @@
+[
+  {
+    "_id": "1",
+    "title": "ブログシステムへようこそ",
+    "content": "これはデモ用の記事です。MongoDBが起動していないため、ダミーデータを表示しています。",
+    "author": {
+      "username": "管理者",
+      "email": "admin@example.com"
+    },
+    "createdAt": "2025-10-16T09:31:10.115Z",
+    "viewCount": 0,
+    "isPublished": true
+  },
+  {
+    "_id": "2",
+    "title": "使い方ガイド",
+    "content": "1. ユーザー登録を行います\n2. ログインして記事を投稿します\n3. 他のユーザーの記事にコメントできます",
+    "author": {
+      "username": "管理者",
+      "email": "admin@example.com"
+    },
+    "createdAt": "2025-10-16T09:31:10.115Z",
+    "viewCount": 0,
+    "isPublished": true
+  },
+  {
+    "_id": "demo_1760615785994",
+    "title": "こんにちは",
+    "content": "こんにちは",
+    "tags": [
+      "ご飯"
+    ],
+    "isPublished": true,
+    "featuredImage": "",
+    "author": {
+      "_id": "3",
+      "username": "も",
+      "email": "csko23072@g.nihon-u.ac.jp"
+    },
+    "createdAt": "2025-10-16T11:56:25.994Z",
+    "viewCount": 0
+  },
+  {
+    "_id": "demo_1760615815646",
+    "title": "こんにちは",
+    "content": "こんにち",
+    "tags": [
+      "おおお"
+    ],
+    "isPublished": false,
+    "featuredImage": "",
+    "author": {
+      "_id": "3",
+      "username": "も",
+      "email": "csko23072@g.nihon-u.ac.jp"
+    },
+    "createdAt": "2025-10-16T11:56:55.646Z",
+    "viewCount": 0
+  }
+]
