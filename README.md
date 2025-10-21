@@ -33,28 +33,14 @@
 
 ```bash
 # 起動スクリプトを実行
-./start_production.sh
+chmod +x start_production.sh && ./start_production.sh
 ```
 
-### 方法2: 手動起動
-
-```bash
-# 依存関係のインストール
-pip install -r requirements.txt
 
 # アプリケーションの起動
 python3 app.py
 ```
-
-### 方法3: Dockerを使用
-
-```bash
-# 開発環境（ポート5002）
-docker-compose up web-dev
-
-# 本番環境（ポート5000）
-docker-compose up web
-```
+PORT=5002 python3 app.py
 
 ## 📡 アクセス方法
 
@@ -171,38 +157,63 @@ docker run -d -p 5000:5000 --name blog-app blog-system
 - SQLインジェクション対策
 - 権限に基づいたアクセス制御
 
-## 📊 データベースモデル
+## 📊 データベーステーブル構造
 
-### User（ユーザー）
-- `id` - 主キー
-- `username` - ユーザー名（一意）
-- `email` - メールアドレス（一意）
-- `password_hash` - ハッシュ化されたパスワード
-- `created_at` - アカウント作成日時
+このソフトウェア全体で以下の4つのテーブルが作成されます：
 
-### Article（記事）
-- `id` - 主キー
-- `title` - 記事タイトル
-- `content` - 記事本文
-- `author_id` - 著者ID（外部キー）
-- `is_published` - 公開フラグ
-- `created_at` - 作成日時
-- `updated_at` - 最終更新日時
+| テーブル名 | 説明 | 主なフィールド |
+|-----------|------|---------------|
+| `User` | ユーザ情報（ユーザ名・メールアドレス・パスワードなど） | `id`, `username`, `email`, `password_hash`, `created_at` |
+| `Article` | 記事情報（タイトル・本文・投稿者・投稿日時など） | `id`, `title`, `content`, `author_id`, `is_published`, `created_at`, `updated_at` |
+| `Comment` | コメント情報（対象記事・投稿者・内容・投稿日時など） | `id`, `content`, `author_id`, `article_id`, `created_at` |
+| `Reply` | 返信情報（対象コメント・投稿者・内容・投稿日時など） | `id`, `content`, `author_id`, `comment_id`, `parent_reply_id`, `created_at` |
 
-### Comment（コメント）
-- `id` - 主キー
-- `content` - コメント本文
-- `author_id` - 投稿者ID（外部キー）
-- `article_id` - 記事ID（外部キー）
-- `created_at` - 投稿日時
+### テーブル詳細
 
-### Reply（返信）
-- `id` - 主キー
-- `content` - 返信本文
-- `author_id` - 投稿者ID（外部キー）
-- `comment_id` - コメントID（外部キー）
-- `parent_reply_id` - 親返信ID（スレッド対応）
-- `created_at` - 投稿日時
+#### User（ユーザー）テーブル
+- `id` - 主キー（自動インクリメント）
+- `username` - ユーザー名（一意、最大80文字）
+- `email` - メールアドレス（一意、最大120文字）
+- `password_hash` - ハッシュ化されたパスワード（最大120文字）
+- `created_at` - アカウント作成日時（自動設定）
+
+#### Article（記事）テーブル
+- `id` - 主キー（自動インクリメント）
+- `title` - 記事タイトル（最大200文字、必須）
+- `content` - 記事本文（テキスト形式、必須）
+- `author_id` - 著者ID（Userテーブルへの外部キー）
+- `is_published` - 公開フラグ（デフォルト: True）
+- `created_at` - 作成日時（自動設定）
+- `updated_at` - 最終更新日時（自動更新）
+
+#### Comment（コメント）テーブル
+- `id` - 主キー（自動インクリメント）
+- `content` - コメント本文（テキスト形式、必須）
+- `author_id` - 投稿者ID（Userテーブルへの外部キー）
+- `article_id` - 記事ID（Articleテーブルへの外部キー）
+- `created_at` - 投稿日時（自動設定）
+
+#### Reply（返信）テーブル
+- `id` - 主キー（自動インクリメント）
+- `content` - 返信本文（テキスト形式、必須）
+- `author_id` - 投稿者ID（Userテーブルへの外部キー）
+- `comment_id` - コメントID（Commentテーブルへの外部キー）
+- `parent_reply_id` - 親返信ID（Replyテーブルへの外部キー、スレッド対応）
+- `created_at` - 投稿日時（自動設定）
+
+### リレーションシップ
+- **User ↔ Article**: 1対多（1人のユーザーが複数の記事を所有）
+- **User ↔ Comment**: 1対多（1人のユーザーが複数のコメントを投稿）
+- **User ↔ Reply**: 1対多（1人のユーザーが複数の返信を投稿）
+- **Article ↔ Comment**: 1対多（1つの記事に複数のコメント）
+- **Comment ↔ Reply**: 1対多（1つのコメントに複数の返信）
+- **Reply ↔ Reply**: 自己参照（返信に対する返信、スレッド構造）
+
+### データベース初期化
+アプリケーション初回起動時に自動的にすべてのテーブルが作成されます：
+```bash
+python3 app.py
+```
 
 ## 🐛 トラブルシューティング
 
