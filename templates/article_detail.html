@@ -4,8 +4,8 @@
 
 {% block content %}
 <article style="max-width: 800px; margin: 0 auto; padding: 0;">
-    <header style="margin-bottom: 2rem; padding-top: 0;">
-        <h1 style="font-size: 2rem; margin-bottom: 1rem; color: #333; font-weight: 600; scroll-margin-top: 80px;">{{ article.title }}</h1>
+    <header style="margin-bottom: 2rem; padding-top: 20px;">
+        <h1 style="font-size: 2rem; margin-bottom: 1rem; color: #333; font-weight: 600; scroll-margin-top: 100px;">{{ article.title }}</h1>
         <div style="display: flex; justify-content: space-between; align-items: center; color: #666; font-size: 0.9rem;">
             <span>著者: {{ article.author.username }}</span>
             <span>投稿日: {{ article.created_at.strftime('%Y年%m月%d日') }}</span>
